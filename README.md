@@ -96,7 +96,11 @@ The owner explicitly selected a **public** repository and free GitHub Pages afte
 
 ## Live Website
 
-Deployment verification is pending. The production URL will be linked here only after a successful deployment and unauthenticated access check.
+[Open Web Application](https://rudwndgus.github.io/bus/)
+
+Deployed and verified on October 26, 2026. Unauthenticated HTTP access returned 200. The two Pages-specific Playwright cases also passed against the public URL, including hash navigation, assets, reload and an offline revisit.
+
+[Public source repository](https://github.com/rudwndgus/bus) · [Successful deployment workflow](https://github.com/rudwndgus/bus/actions/runs/40339455971)
 
 ## Project Limitations
 

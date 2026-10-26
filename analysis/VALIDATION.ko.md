@@ -32,3 +32,11 @@
 사용자가 Vercel 대신 GitHub Pages를 선택하고, 현재 계정의 private Pages 미지원(HTTP422)을 확인한 후 `bus` 저장소를 공개로 변경해 무료 Pages에 배포하도록 명시적으로 승인했다. `/bus/` asset base와 HashRouter, scope를 따르는 서비스 워커를 사용한다. 원본 비공개 요구는 이 후속 승인으로 변경됐다.
 
 - Pages 전용 Playwright 2개 추가 통과: `/bus/` 자산 경로, HashRouter 새로고침, scope 및 오프라인 재방문.
+
+## 실제 배포 확인 (2026-10-26)
+
+- GitHub Actions run 40339455971: build와 deploy 모두 success.
+- https://rudwndgus.github.io/bus/ : 인증 쿠키 없는 HTTP 요청 200.
+- 공개 사이트 대상 Pages 전용 Playwright 2개 모두 통과. 로그인 요구 없이 홈, 구매, 티켓, 새로고침, 이미지 로딩과 오프라인 재방문 확인.
+- `bus` 저장소 visibility=PUBLIC 확인 (사용자 후속 승인).
+- 초기 Pages 환경이 master만 허용해 첫 배포가 거절됐으며, 해당 새 저장소에 main 허용을 추가한 뒤 성공. Vercel 사용 안 함.
