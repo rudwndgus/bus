@@ -1,0 +1,17 @@
+﻿node_modules/
+dist/
+.env*
+!.env.example
+.vercel/
+.netlify/
+playwright-report/
+test-results/
+IMAGE/
+analysis/frames/
+analysis/*contact*.jpg
+analysis/dense-*.jpg
+analysis/scene-detection.log
+analysis/local-assets/
+*.zip
+*.log
+*.tsbuildinfo
