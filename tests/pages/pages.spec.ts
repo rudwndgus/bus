@@ -26,6 +26,15 @@ test("Pages base, hash navigation, assets and reload", async ({ page }) => {
     page.getByRole("heading", { name: "Buy Tickets" }),
   ).toBeVisible();
   expect(errors).toEqual([]);
+  await page.goto("./#/tickets/two");
+  await expect(page.locator(".preview-panel img")).toBeVisible();
+  await expect(
+    page.locator(".status-bar,.island,.preview-caption"),
+  ).toHaveCount(0);
+  await expect(page.locator(".screen-content")).not.toContainText("NOT VALID");
+  await page.getByRole("button", { name: "Enlarge ticket QR" }).click();
+  await expect(page.locator(".enlarged")).toBeVisible();
+  await expect(page.locator(".toolbar")).toHaveCount(0);
 });
 test("Pages service worker remains scoped to bus and supports offline revisit", async ({
   page,

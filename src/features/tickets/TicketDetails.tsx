@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import previewQr from "../../assets/ticket-preview-qr.svg";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Icon } from "../../components/Icon";
 import Modal from "../../components/Modal";
 import { useAppStore } from "../../store/useAppStore";
@@ -13,7 +14,10 @@ export default function TicketDetails() {
     useAppStore((s) => s.tickets.find((t) => t.id === id)) ??
     historyTickets.find((t) => t.id === id);
   const appearance = useAppStore((s) => s.appearance);
-  const [enlarged, setEnlarged] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const enlarged = searchParams.get("enlarged") === "1";
+  const setEnlarged = (value: boolean) =>
+    setSearchParams(value ? { enlarged: "1" } : {}, { replace: true });
   const [instructions, setInstructions] = useState(false);
   if (!ticket)
     return (
@@ -33,18 +37,10 @@ export default function TicketDetails() {
         {enlarged && <h2 className="enlarged-title">One Way Ticket</h2>}
         <button
           className="preview-panel"
-          onClick={() => setEnlarged((v) => !v)}
-          aria-label={
-            enlarged ? "Reduce ticket preview" : "Enlarge ticket preview"
-          }
+          onClick={() => setEnlarged(!enlarged)}
+          aria-label={enlarged ? "Reduce ticket QR" : "Enlarge ticket QR"}
         >
-          <Icon name="ban" />
-          <strong>
-            NOT VALID
-            <br />
-            FOR TRAVEL
-          </strong>
-          <small>UI PREVIEW · NO FARE CREDENTIAL</small>
+          <img src={previewQr} alt="Ticket QR code" />
         </button>
         {!enlarged && <small className="tap">Tap to enlarge</small>}
         <div className="ticket-divider" />
@@ -55,8 +51,6 @@ export default function TicketDetails() {
           <p>1 Adult</p>
         </div>
         <div className="preview-footer">
-          <span>Not valid for boarding</span>
-          <small>No payment or ticket activation has occurred.</small>
           {enlarged ? (
             <button className="primary" onClick={() => setEnlarged(false)}>
               <Icon name="left" /> Back to ticket
@@ -85,16 +79,12 @@ export default function TicketDetails() {
             <Icon name="phone" />
             <Icon name="right" />
             <div className="validator">
-              <Icon name="ban" />
+              <img src={previewQr} alt="QR code" />
             </div>
           </div>
           <p>
             Customers boarding buses equipped with validators will be required
             to scan barcode.
-          </p>
-          <p className="preview-notice">
-            This interface study contains no barcode or valid ticket. It cannot
-            be scanned or used to board.
           </p>
         </Modal>
       )}

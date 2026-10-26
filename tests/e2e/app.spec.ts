@@ -72,18 +72,24 @@ test("preview confirmation, cancellation, persistence, enlargement, instructions
   await page
     .getByRole("button", { name: "Activate Ticket(s)", exact: true })
     .click();
-  await page.getByRole("button", { name: "Open Ticket Preview" }).click();
+  await page
+    .getByRole("button", { name: "Activate Ticket", exact: true })
+    .click();
   await page.reload();
   await page
-    .getByRole("button", { name: "2 INTRASTATE preview ticket" })
+    .getByRole("button", { name: "2 INTRASTATE active ticket" })
     .click();
-  await expect(page.getByText("NOT VALID")).toBeVisible();
-  await page.getByRole("button", { name: "Enlarge ticket preview" }).click();
+  await expect(page.getByText("NOT VALID")).toHaveCount(0);
+  await page.getByRole("button", { name: "Enlarge ticket QR" }).click();
+  await expect(page.locator(".enlarged")).toBeVisible();
+  await expect(page.locator(".toolbar")).toHaveCount(0);
   await page.getByRole("button", { name: "Back to ticket" }).click();
   await page
     .getByRole("button", { name: "View Onboard Validator Instructions" })
     .click();
-  await expect(page.getByRole("dialog")).toContainText("contains no barcode");
+  await expect(page.getByRole("dialog")).toContainText(
+    "Customers boarding buses equipped with validators",
+  );
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("tab", { name: "All Tickets", exact: true }).click();
@@ -96,7 +102,7 @@ test("preview confirmation, cancellation, persistence, enlargement, instructions
     .click();
   await page.getByRole("button", { name: "Refresh tickets" }).click();
   await expect(
-    page.getByRole("status").filter({ hasText: "Local ticket list refreshed" }),
+    page.getByRole("status").filter({ hasText: "Tickets refreshed" }),
   ).toBeVisible();
 });
 test("unknown routes and unavailable controls are explicit", async ({
@@ -146,6 +152,7 @@ for (const size of [
     ).toBe(true);
   });
 test("capture verified screens", async ({ page }) => {
+  await page.setViewportSize({ width: 592, height: 1144 });
   await home(page);
   await page.screenshot({ path: "analysis/implementation/home.png" });
   await page.getByRole("link", { name: "Rider Tools" }).click();
@@ -185,15 +192,19 @@ test("capture verified screens", async ({ page }) => {
     .getByRole("button", { name: "Activate Ticket(s)", exact: true })
     .click();
   await page.screenshot({ path: "analysis/implementation/activate.png" });
-  await page.getByRole("button", { name: "Open Ticket Preview" }).click();
   await page
-    .getByRole("button", { name: "2 INTRASTATE preview ticket" })
+    .getByRole("button", { name: "Activate Ticket", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "2 INTRASTATE active ticket" })
     .click();
   await expect(
     page.getByRole("heading", { name: "One Way Ticket", exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: "analysis/implementation/detail.png" });
-  await page.getByRole("button", { name: "Enlarge ticket preview" }).click();
+  await page.getByRole("button", { name: "Enlarge ticket QR" }).click();
+  await expect(page.locator(".enlarged")).toBeVisible();
+  await expect(page.locator(".toolbar")).toHaveCount(0);
   await page.screenshot({ path: "analysis/implementation/enlarged.png" });
 });
 test("ticket theme survives reload and drives CSS variables", async ({
@@ -223,7 +234,7 @@ test("ticket theme survives reload and drives CSS variables", async ({
     "border-top-color",
     "rgb(168, 85, 247)",
   );
-  await expect(page.locator(".preview-panel")).toContainText("NOT VALID");
+  await expect(page.locator(".preview-caption")).toHaveCount(0);
 });
 test("production PWA caches the shell for an offline revisit", async ({
   page,
@@ -247,4 +258,46 @@ test("production PWA caches the shell for an offline revisit", async ({
   await page.reload();
   await expect(page.getByText("About this project")).toBeVisible();
   await context.setOffline(false);
+});
+import jsQR from "jsqr";
+import previewPayload from "../../src/assets/ticket-preview-payload.json" with { type: "json" };
+import { PNG } from "pngjs";
+test("native app content excludes device chrome and preview QR has no credential", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "nj-ui-study-v1",
+      JSON.stringify({
+        version: 0,
+        state: {
+          appearance: {
+            borderColor: "#2563eb",
+            accentColor: "#2563eb",
+            backgroundColor: "#ffffff",
+            textColor: "#080808",
+          },
+        },
+      }),
+    ),
+  );
+  await page.goto("/tickets/two");
+  await expect(
+    page.getByRole("heading", { name: "One Way Ticket", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".status-bar,.island")).toHaveCount(0);
+  expect((await page.locator(".toolbar").boundingBox())?.y).toBe(0);
+  await expect(page.locator(".preview-panel")).toHaveCSS(
+    "border-top-color",
+    "rgb(255, 37, 44)",
+  );
+  const image = PNG.sync.read(
+    await page.locator(".preview-panel img").screenshot(),
+  );
+  const decoded = jsQR(
+    new Uint8ClampedArray(image.data),
+    image.width,
+    image.height,
+  );
+  expect(decoded?.data).toBe(previewPayload.payload);
 });

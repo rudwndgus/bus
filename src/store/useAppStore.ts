@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
   defaultTicketAppearance,
+  migrateTicketAppearance,
   type TicketAppearance,
 } from "../features/tickets/ticketTheme";
 import { initialTickets } from "../services/transit";
@@ -46,6 +47,18 @@ export const useAppStore = create<AppState>()(
             : [...s.favorites, id],
         })),
     }),
-    { name: "nj-ui-study-v1" },
+    {
+      name: "nj-ui-study-v1",
+      version: 1,
+      migrate: (persisted) => {
+        const state = persisted as Partial<AppState>;
+        return {
+          ...state,
+          appearance: migrateTicketAppearance(
+            state.appearance ?? defaultTicketAppearance,
+          ),
+        };
+      },
+    },
   ),
 );

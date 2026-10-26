@@ -22,9 +22,6 @@ import {
   Star,
   Ban,
   Smartphone,
-  Navigation,
-  Signal,
-  BatteryFull,
 } from "lucide-react";
 const icons = {
   bus: BusFront,
@@ -50,9 +47,6 @@ const icons = {
   star: Star,
   ban: Ban,
   phone: Smartphone,
-  navigation: Navigation,
-  signal: Signal,
-  battery: BatteryFull,
 };
 export function Icon({
   name,

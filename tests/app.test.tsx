@@ -60,3 +60,19 @@ describe("persistent local state", () => {
     expect(useAppStore.getState().favorites).toEqual([]);
   });
 });
+import { migrateTicketAppearance } from "../src/features/tickets/ticketTheme";
+describe("appearance upgrade", () => {
+  it("replaces the retired blue placeholder with the recorded static border", () => {
+    expect(
+      migrateTicketAppearance({
+        ...defaultTicketAppearance,
+        borderColor: "#2563eb",
+        accentColor: "#2563eb",
+      }).borderColor,
+    ).toBe("#ff252c");
+  });
+  it("preserves deliberate custom border colors", () => {
+    const custom = { ...defaultTicketAppearance, borderColor: "#a855f7" };
+    expect(migrateTicketAppearance(custom)).toEqual(custom);
+  });
+});

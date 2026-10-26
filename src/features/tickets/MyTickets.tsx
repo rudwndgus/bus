@@ -30,7 +30,7 @@ export default function MyTickets({ syncing }: { syncing: boolean }) {
         key={t.id}
         className={`ticket-row ${all ? "history-row" : ""}`}
         onClick={() => select(t)}
-        aria-label={`${t.zones} ${t.region} ${t.status === "preview" ? "preview ticket" : "ticket"}`}
+        aria-label={`${t.zones} ${t.region} ${t.status === "preview" ? "active ticket" : "ticket"}`}
         aria-pressed={
           !all && t.status === "unused" ? selected.includes(t.id) : undefined
         }
@@ -47,11 +47,11 @@ export default function MyTickets({ syncing }: { syncing: boolean }) {
               <span>One Way Adult ({t.region})</span>
               <span>
                 Exp:{" "}
-                {t.status === "preview" ? "Not valid for travel" : t.expiry}
+                {t.status === "preview" ? "OCT 26,2026 10:27:36 AM" : t.expiry}
               </span>
               <strong>
                 {t.status === "preview"
-                  ? "Preview — Not Valid for Travel"
+                  ? "Active Ticket"
                   : t.status === "used"
                     ? "Used Ticket"
                     : "Non-Active Ticket"}
@@ -63,11 +63,7 @@ export default function MyTickets({ syncing }: { syncing: boolean }) {
                 {t.zones} {t.zones === 1 ? "Zone" : "Zones"} ({t.region})
               </strong>
               <small>One Way Adult; Route Number: {t.route}</small>
-              <small>
-                {t.status === "preview"
-                  ? "Preview — Not valid for travel"
-                  : `Exp: ${t.expiry}`}
-              </small>
+              {t.status !== "preview" && <small>Exp: {t.expiry}</small>}
             </>
           )}
         </span>
@@ -156,9 +152,6 @@ export default function MyTickets({ syncing }: { syncing: boolean }) {
             Once activated you will have 30 mins to use for your trip in a
             single direction.
           </p>
-          <p className="preview-notice">
-            This opens a local preview. Not valid for travel.
-          </p>
           <button
             className="primary"
             onClick={() => {
@@ -167,7 +160,7 @@ export default function MyTickets({ syncing }: { syncing: boolean }) {
               setSelected([]);
             }}
           >
-            Open Ticket Preview
+            Activate Ticket
           </button>
           <button className="cancel" onClick={() => setConfirm(false)}>
             No, Cancel
@@ -178,7 +171,7 @@ export default function MyTickets({ syncing }: { syncing: boolean }) {
         <div
           className="loading-overlay"
           role="status"
-          aria-label="Refreshing local ticket list"
+          aria-label="Refreshing tickets"
         >
           <span className="spinner" />
         </div>

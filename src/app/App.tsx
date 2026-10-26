@@ -17,23 +17,6 @@ const railText =
   "Special Portal Cutover train schedules will go into effect Sunday, October 11 through Saturday, November 14 on all rail lines except the ACRL. During this time, Midtown Direct customers on the Morristown Line, Gladstone Branch, and Montclair-Boonton Line traveling to Penn Station New York on WEEKDAYS should travel to Hoboken for alternate service to New York. Tap More Info for details.";
 const portalText =
   "Due to Amtrak Portal Bridge Cutover work from October 11 through mid November, customers traveling to New York in October and November should purchase their Monthly pass, Weekly pass or FLEXPASS to Hoboken via Newark Broad Street instead of Penn Station New York. Hoboken passes will be accepted for travel to PSNY from October 1 through November 30.";
-function StatusBar() {
-  return (
-    <div className="status-bar" aria-hidden="true">
-      <strong>
-        9:57 <Icon name="navigation" />
-      </strong>
-      <div className="island">
-        <i />
-      </div>
-      <span>
-        <Icon name="signal" />
-        <b>5G</b>
-        <Icon name="battery" />
-      </span>
-    </div>
-  );
-}
 function NewsBanner() {
   return (
     <img
@@ -235,7 +218,7 @@ export default function App() {
     if (!syncing) return;
     const t = setTimeout(() => {
       setSyncing(false);
-      setToast("Local ticket list refreshed");
+      setToast("Tickets refreshed");
     }, 650);
     return () => clearTimeout(t);
   }, [syncing]);
@@ -261,41 +244,44 @@ export default function App() {
     <div
       className={`app-shell ${home ? "on-home" : ""} ${isDetail ? "on-detail" : ""} ${location.pathname === "/buy" || location.pathname === "/tickets/select" ? "purchase-screen" : ""}`}
     >
-      <StatusBar />
-      {!home && (
-        <header className="toolbar">
-          {(location.pathname === "/buy" ||
-            location.pathname === "/tickets/select" ||
-            isDetail) && (
-            <button
-              aria-label="Back"
-              className="back"
-              onClick={() =>
-                navigate(
-                  location.pathname === "/buy"
-                    ? "/"
-                    : location.pathname === "/tickets/select"
-                      ? "/buy"
-                      : "/tickets",
-                )
-              }
-            >
-              <Icon name="left" />
-            </button>
-          )}
-          <h1>{title}</h1>
-          {location.pathname === "/tickets" && (
-            <button
-              aria-label="Refresh tickets"
-              className="refresh"
-              disabled={syncing}
-              onClick={() => setSyncing(true)}
-            >
-              <Icon name="refresh" />
-            </button>
-          )}
-        </header>
-      )}
+      {!home &&
+        !(
+          isDetail &&
+          new URLSearchParams(location.search).get("enlarged") === "1"
+        ) && (
+          <header className="toolbar">
+            {(location.pathname === "/buy" ||
+              location.pathname === "/tickets/select" ||
+              isDetail) && (
+              <button
+                aria-label="Back"
+                className="back"
+                onClick={() =>
+                  navigate(
+                    location.pathname === "/buy"
+                      ? "/"
+                      : location.pathname === "/tickets/select"
+                        ? "/buy"
+                        : "/tickets",
+                  )
+                }
+              >
+                <Icon name="left" />
+              </button>
+            )}
+            <h1>{title}</h1>
+            {location.pathname === "/tickets" && (
+              <button
+                aria-label="Refresh tickets"
+                className="refresh"
+                disabled={syncing}
+                onClick={() => setSyncing(true)}
+              >
+                <Icon name="refresh" />
+              </button>
+            )}
+          </header>
+        )}
       <main className={`screen-content ${hideNav ? "no-nav" : ""}`}>
         <Routes>
           <Route

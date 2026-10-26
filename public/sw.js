@@ -1,4 +1,4 @@
-const CACHE = "nj-ui-study-v2";
+const CACHE = "nj-ui-study-v3";
 const BASE = new URL("./", self.location.href).href;
 self.addEventListener("install", (event) => {
   event.waitUntil(
